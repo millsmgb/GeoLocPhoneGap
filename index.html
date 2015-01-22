@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>GeoLoc - GeoLocation Tracking</title>
+        <link href="./Content/themes/base/jquery.ui.all.css" rel="stylesheet" type="text/css" />
+        <link href="./Content/Site.css" rel="stylesheet" type="text/css" />
+        <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/pure-min.css">
+        <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/grids-responsive-min.css">
+        <link href="favicon.ico" rel="shortcut icon" type="image/x-icon" />
+        <script src="./Scripts/jquery-1.10.2.min.js"></script>
+        <script src="./Scripts/jquery-ui-1.10.3.js"></script>
+        <script src="./Scripts/modernizr-2.6.2.js"></script>
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDKvHVTntWLdwFfyPsYKGxumkU5OaBTJV4"></script>
+        <script src="./Scripts/Coordinates.js"></script>
+        <script src="./Scripts/Chart.js"></script>
+        <meta name="viewport" content="width=device-width" />
+    </head>
+    <body>
+        <header>
+            <div class="content-wrapper">
+                <div class="float-left">
+                    <p class="site-title"><a href="~/">GPS Loc Testing</a></p>
+                </div>
+            </div>
+        </header>
+        <div id="body">
+
+            <section class="content-wrapper main-content clear-fix">
+                <section class="featured">
+                    <div class="content-wrapper">
+                        <hgroup class="title">
+                            <h1>GeoLoc</h1>
+                            <h2>A map should display here giving you your exact coordinates on a Google Map spread</h2>
+                        </hgroup>
+                    </div>
+                </section>
+                }
+
+                <div id="buttons" style="text-align:center">
+                    <button id="tracker">Click Here to start geolocation</button>
+                    <button id="stopper" style="display:none;">Click Here to stop geolocation</button>
+                </div>
+
+                <section id="mappingStuff" style="display:none;">
+
+                    <section class="stuff" id="stuff" style="text-align:center;">
+                        <div id="map-canvas" style="width: 300px; height: 350px; text-align: center; margin-left:auto; margin-right:auto; display:none;"></div>
+                        <div id="loading">
+                            <p>Map will load once you click stop geolocation</p>
+                        </div>
+                    </section>
+
+                    <section class="coords" id="coords" style="text-align:center; display:none;">
+                        <div class="pure-g">
+                            <div class="pure-u-1 pure-u-md-1-2" id="column-1">
+                                <h3>Distance Travelled</h3>
+                                <p id="distlatlon"></p>
+                                <h3>Average Speed</h3>
+                                <p id="speedlatlon"></p>
+                            </div>
+                            <div class="pure-u-1 pure-u-md-1-2" id="column-2">
+                                <h3>Time Taken</h3>
+                                <p id="timelatlon"></p>
+                                <h3>Average Speed in km/h</h3>
+                                <p id="speedlatlonKMH"></p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="graphs" id="graphs" style="text-align:center; display:none">
+                        <div class="pure-g">
+                            <div class="pure-u-1 pure-u-md-1-2" id="graph-column-1">
+                                <h2>Variation in Distance over Time</h2>
+                                <canvas id="distanceChart" width="250" height="250"></canvas>
+                            </div>
+                            <div class="pure-u-1 pure-u-md-1-2" id="graph-column-2">
+                                <h2>Variation in Speed over Time</h2>
+                                <canvas id="speedChart" width="250" height="250"></canvas>
+                            </div>
+                        </div>
+                    </section>
+                </section>
+
+                <section class="details" id="details" style="text-align:center; display:none">  
+                    <h2>Detailed Information</h2>
+                    <table class ="pure-table" id="coords-table" border="1" style="margin-left:auto; margin-right:auto; width:300px">
+                        <thead>
+                            <tr>
+                                <th><strong>Latitude</strong></th>
+                                <th><strong>Longitude</strong></th>
+                                <th><strong>Time</strong></th>
+                            </tr>
+                        </thead>
+                        <tbody style="text-align:center"></tbody>
+                    </table>
+                </section>
+
+                <p id="map-error"></p>
+
+                <script>
+                    var id, start, elapsed;
+
+                    $("#tracker").click(function () {
+
+
+                        if (navigator.geolocation) {
+                            $("#tracker").hide();
+
+                            $("#stopper").show();
+                            $("#mappingStuff").slideDown();
+                            $("#details").slideDown();
+                            start = new Date();
+                            setStart(start);
+                            id = navigator.geolocation.watchPosition(showPosition);
+                        } else {
+                            $("#map-error").append("Geolocation is not supported by this browser");
+                        }
+                    });
+
+                    $("#stopper").click(function () {
+                        $("#stopper").hide();
+
+                        $("#loading").hide();
+                        $("#map-canvas").show();
+                        $("#coords").slideDown();
+
+                        navigator.geolocation.clearWatch(id);
+                        elapsed = new Date() - start;
+                        initialise();
+
+                        calcStats(elapsed);
+
+                        generateCharts();
+
+                        $("#graphs").slideDown();
+                    })
+                </script>               
+            </section>
+        </div>
+        <footer>
+            <div class="content-wrapper">
+                <div class="float-left">
+                    <p>&copy 2015 - Matthew Mills Testing</p>
+                </div>
+            </div>
+        </footer>
+    </body>
+</html>
